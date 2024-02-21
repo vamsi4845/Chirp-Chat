@@ -1,15 +1,26 @@
 "use client";
 
+import axios from "axios";
 import Button from "@/app/components/Button";
 import Input from "@/app/components/inputs/Input";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm, FieldValues, SubmitHandler } from "react-hook-form";
-import AuthSocialButton from "./AuthSociaButtonl";
+import AuthSocialButton from "./AuthSociaButton";
 import { BsGithub, BsGoogle } from "react-icons/bs";
+import { toast } from "react-hot-toast";
+import { signIn, useSession } from "next-auth/react";
+
 type Variant = "LOGIN" | "REGISTER";
+
 const AuthForm = () => {
+  const session = useSession();
   const [variant, setVariant] = useState<Variant>("LOGIN");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (session?.status === "authenticated") {
+    }
+  }, [session?.status]);
 
   const toggleVariant = useCallback(() => {
     if (variant === "LOGIN") {
@@ -34,13 +45,41 @@ const AuthForm = () => {
   const onSubmit: SubmitHandler<FieldValues> = (data) => {
     setLoading(true);
     if (variant === "REGISTER") {
+      axios
+        .post("/api/register", data)
+        .catch(() => toast.error("Something went wrong"))
+        .finally(() => setLoading(false));
     }
 
     if (variant === "LOGIN") {
+      signIn("credentials", {
+        ...data,
+        redirect: false,
+      })
+        .then((callback) => {
+          if (callback?.error) {
+            toast.error("Invalid credentials");
+          }
+          if (callback?.ok && !callback?.error) {
+            toast.success("Logged in");
+          }
+        })
+        .finally(() => setLoading(false));
     }
   };
   const socialAction = (action: string) => {
     setLoading(true);
+
+    signIn(action, { redirect: false })
+      .then((callback) => {
+        if (callback?.error) {
+          toast.error("Invalid credentials");
+        }
+        if (callback?.ok && !callback?.error) {
+          toast.success("Logged in");
+        }
+      })
+      .finally(() => setLoading(false));
   };
   return (
     <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
