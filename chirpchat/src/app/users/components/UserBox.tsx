@@ -1,10 +1,10 @@
 "use client";
 
-import Avatar from "@/app/components/Avatar";
-import { User } from "@prisma/client";
 import axios from "axios";
+import { User } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+import Avatar from "@/app/components/Avatar";
 
 interface UserBoxProps {
   data: User;
@@ -12,6 +12,7 @@ interface UserBoxProps {
 const UserBox: React.FC<UserBoxProps> = ({ data }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+
   const handleClick = useCallback(() => {
     setIsLoading(true);
 

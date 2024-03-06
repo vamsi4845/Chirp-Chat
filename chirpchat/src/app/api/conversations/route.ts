@@ -15,7 +15,7 @@ export async function POST(
             name
         }=body
         
-        if (!currentUser?.id || currentUser?.email) {
+        if (!currentUser?.id || !currentUser?.email) {
             return new NextResponse('unauthorized',{status:401})
         }
 
@@ -86,6 +86,8 @@ export async function POST(
                 users:true
             }
         })
+
+        return NextResponse.json(newConversation)
     } catch (error: any) {
         return new NextResponse('Internal Error',{status:500})
     }
