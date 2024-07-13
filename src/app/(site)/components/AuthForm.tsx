@@ -26,15 +26,6 @@ const AuthForm = () => {
     }
   }, [session?.status, router]);
 
-  // useEffect(() => {
-  //   const checkAndRedirect = async () => {
-  //     const res = await fetch('/api/auth/check-auth');
-  //     if (res.ok) {
-  //       router.push("/users");
-  //     }
-  //   };
-  //   checkAndRedirect();
-  // }, [router]);
   const toggleVariant = useCallback(() => {
     setVariant((prevVariant) => prevVariant === "LOGIN" ? "REGISTER" : "LOGIN");
   }, []);
@@ -52,12 +43,24 @@ const AuthForm = () => {
     try {
       if (variant === "REGISTER") {
         await axios.post("/api/register", data);
-        await signIn("credentials", data);
+        const result = await signIn("credentials", {
+          ...data,
+          redirect: false,
+        });
+        if (result?.error) {
+          toast.error("Registration failed");
+        } else if (result?.ok) {
+          toast.success("Registered successfully");
+          router.push("/users");
+        }
       } else {
-        const callback = await signIn("credentials", { ...data, redirect: false });
-        if (callback?.error) {
+        const result = await signIn("credentials", {
+          ...data,
+          redirect: false,
+        });
+        if (result?.error) {
           toast.error("Invalid credentials");
-        } else if (callback?.ok) {
+        } else if (result?.ok) {
           toast.success("Logged in");
           router.push("/users");
         }

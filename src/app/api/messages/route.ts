@@ -38,18 +38,19 @@ export async function POST(request: Request) {
 
     const newMessage = result.messages[0];
 
-    setTimeout(() => {
-      pusherServer.trigger(conversationId, "messages:new", newMessage).catch(console.error);
+    // Remove setTimeout and execute Pusher triggers immediately
+    await pusherServer.trigger(conversationId, "messages:new", newMessage);
 
-      result.users.forEach(user => {
-        if (user.email) {
-          pusherServer.trigger(user.email, "conversation:update", {
-            id: conversationId,
-            messages: [newMessage]
-          }).catch(console.error);
-        }
-      });
-    }, 0);
+    const updatePromises = result.users.map(async (user) => {
+      if (user.email) {
+        await pusherServer.trigger(user.email, "conversation:update", {
+          id: conversationId,
+          messages: [newMessage]
+        });
+      }
+    });
+
+    await Promise.all(updatePromises);
 
     return NextResponse.json(newMessage);
   } catch (error) {

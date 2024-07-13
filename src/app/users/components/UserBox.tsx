@@ -16,14 +16,13 @@ const UserBox: React.FC<UserBoxProps> = ({ data }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = useCallback(async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
       const response = await axios.post("/api/conversations", { userId: data.id });
       router.push(`/conversations/${response.data.id}`);
     } catch (error) {
       console.error("Error creating conversation:", error);
-    } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Only set loading to false if there's an error
     }
   }, [data.id, router]);
 
@@ -31,7 +30,10 @@ const UserBox: React.FC<UserBoxProps> = ({ data }) => {
     <>
       {isLoading && <LoadingModal />}
       <div
-        onClick={handleClick}
+        onClick={(e) => {
+          e.preventDefault();
+          handleClick();
+        }}
         className="w-full relative flex items-center space-x-3 bg-white p-3 hover:bg-neutral-100 rounded-lg transition cursor-pointer"
       >
         <Avatar user={data} />
