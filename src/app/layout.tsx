@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "ChirpChat",
   description: "Real time messenger app",
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({
