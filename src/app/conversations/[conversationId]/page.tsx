@@ -1,5 +1,6 @@
 import getConversationById from "@/app/actions/getConversationById";
 import getMessages from "@/app/actions/getMessages";
+import { notFound } from 'next/navigation';
 
 import EmptyState from "@/app/components/EmptyState";
 import Header from "./components/Header";
@@ -11,8 +12,21 @@ interface IParams {
 }
 
 const ConversationId = async ({ params }: { params: IParams }) => {
+  if (!params.conversationId) {
+    notFound();
+  }
+
   const conversation = await getConversationById(params.conversationId);
   const messages = await getMessages(params.conversationId);
+
+  if (!conversation) {
+    return (
+      <div>
+        <h1>Conversation not found</h1>
+        <p>The requested conversation does not exist or you don't have access to it.</p>
+      </div>
+    );
+  }
 
   if (!conversation) {
     return (

@@ -1,5 +1,6 @@
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "./getCurrentUser";
+import { ObjectId } from 'mongodb';
 
 const getConversationById = async (
   conversationId: string
@@ -10,7 +11,12 @@ const getConversationById = async (
     if (!currentUser?.email) {
       return null;
     }
-  
+
+    // Validate the conversationId
+    if (!conversationId || !ObjectId.isValid(conversationId)) {
+      return null; // Return null instead of throwing an error
+    }
+
     const conversation = await prisma.conversation.findUnique({
       where: {
         id: conversationId
@@ -19,6 +25,10 @@ const getConversationById = async (
         users: true,
       },
     });
+
+    if (!conversation) {
+      return null; // Return null instead of throwing an error
+    }
 
     return conversation;
   } catch (error: any) {
