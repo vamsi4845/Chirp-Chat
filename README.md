@@ -1,6 +1,7 @@
 <h2>Chirp Chat</h2>
 
 • Developed real-time messaging features using Next.js and React , ensuring seamless communication
+
 • Implemented sleek UI design with Tailwind CSS for a modern user experience
 
 • Integrated authentication with NextAuth, Google, and GitHub for secure user access
